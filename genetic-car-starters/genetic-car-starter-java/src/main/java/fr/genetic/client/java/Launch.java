@@ -3,6 +3,7 @@ package fr.genetic.client.java;
 import fr.genetic.client.java.algo.Car;
 import fr.genetic.client.java.api.CarScoreView;
 import fr.genetic.client.java.api.CarView;
+import fr.genetic.client.java.api.CarViewDao;
 import fr.genetic.client.java.api.Team;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.security.SecureRandom;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -29,6 +31,7 @@ public class Launch implements CommandLineRunner {
 
     @Value("${genetic.server.host}")
     private String host;
+    CarViewDao carViewDao = new CarViewDao();
 
     @Autowired
     private RestTemplate restTemplate;
@@ -41,7 +44,7 @@ public class Launch implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
         try {
             doMyAlgo();
         } catch (RestClientException restException) {
@@ -58,27 +61,42 @@ public class Launch implements CommandLineRunner {
 
     private static SecureRandom random = new SecureRandom();
 
-    protected void doMyAlgo() {
-        List<CarView> cars = IntStream.range(0, 20)
+    protected void doMyAlgo() throws Exception {
+        List<CarView> cars = carViewDao.restoreLastSaved();
+        cars = cars.isEmpty() ? cars : IntStream.range(0, 20)
                 .mapToObj(i -> Car.random().toCarView())
                 .collect(Collectors.toList());
         List<CarScoreView> carScores = null;
         for (int i = 0; i < 10; i++) {
             carScores = evaluate(cars);
+            List<CarView> allSorted = carScores.stream() //
+                    .sorted((carScore1, carScore2) -> -Float.compare(carScore1.score, carScore2.score)) //
+                    .map(c -> c.car) //
+                    .collect(Collectors.toList());
+            carViewDao.save(allSorted);
+
             // selection
             List<CarView> best = selectBest(carScores);
 
             // crossManyCars
             cars = crossManyCars(carScores);
-            cars.addAll(best);
+
+            cars = mutate(cars);
 
             // mutation
+            cars.addAll(best);
         }
 
         CarScoreView champion = carScores.stream()
                 .max((carScore1, carScore2) -> Float.compare(carScore1.score, carScore2.score))
                 .get();
         LOGGER.info("Mon champion est {}", champion);
+    }
+
+    private List<CarView> mutate(List<CarView> cars) {
+        return cars.stream().map(c -> {
+            return c.mutate();
+        }).collect(Collectors.toList());
     }
 
     private List<CarView> selectBest(List<CarScoreView> carScores) {
@@ -92,8 +110,8 @@ public class Launch implements CommandLineRunner {
                 .limit(4) //
                 .map(c -> c.score) //
                 .collect(Collectors.toList());
-        System.out.println(scores);
-        System.out.println(best);
+//        System.out.println(scores);
+//        System.out.println(best);
         return best;
     }
 

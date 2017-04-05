@@ -19,11 +19,12 @@ public class CarViewDao {
         CarView[] carViewArray = new ArrayList<CarView>(carViews).toArray(new CarView[]{});
         FileWriter fw = new FileWriter(CARS_JSON);
         gson.toJson(carViewArray,fw );
+        System.out.println(        gson.toJson(carViewArray));
         fw.flush();
         fw.close();
     }
 
-    public Collection<CarView> restoreLastSaved(){
+    public List<CarView> restoreLastSaved(){
         try {
             Gson gson = new Gson();
             FileReader fr = new FileReader(CARS_JSON);

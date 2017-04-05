@@ -46,6 +46,10 @@ public class CarView {
         return random.nextBoolean() ? this : other;
     }
 
+    public CarView mutate() {
+        return this;
+    }
+
     public static class Chassis {
         public List<Float> vecteurs = new ArrayList<>();
         public float densite;
