@@ -46,6 +46,7 @@ public class Car {
         car.coords[13] = -Random.nextChassisAxis();
         car.coords[14] = Random.nextChassisAxis();
         car.coords[15] = -Random.nextChassisAxis();
+
         car.coords[16] = Random.nextChassisDensity();
         car.coords[17] = Random.nextWheelDensity();
         car.coords[18] = Random.nextWheelRadius();

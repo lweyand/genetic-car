@@ -37,27 +37,4 @@ public class CarViewDao {
         return Collections.emptyList();
     }
 
-    public static void main(String[] args) throws Exception{
-        CarViewDao carViewDao = new CarViewDao();
-
-        List<CarView> carViews = new ArrayList<>();
-        CarView cv = new CarView();
-        cv.chassis.vecteurs.add(new Float(1.1));
-        cv.wheel1.radius=1.1f;
-        cv.wheel1.density=1.1f;
-        cv.wheel1.vertex=3;
-
-        cv.wheel2.radius=2.1f;
-        cv.wheel2.density=3.1f;
-        cv.wheel2.vertex=3;
-
-        carViews.add(cv);
-
-        carViewDao.save(carViews);
-
-        Collection<CarView> load = carViewDao.restoreLastSaved();
-        System.out.println(load.iterator().next());
-
-    }
-
 }
