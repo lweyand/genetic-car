@@ -32,7 +32,7 @@ public class Launch implements CommandLineRunner {
     @Autowired
     private RestTemplate restTemplate;
 
-    private Team team = Team.BLUE;
+    private Team team = Team.RED;
 
 
     public static void main(String[] args) {
